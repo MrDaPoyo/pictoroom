@@ -17,31 +17,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Store the feed of drawings
 const drawings = [];
-
-app.get('/chat/:room', (req, res) => {
-    res.render('chatroom', {room: req.params.room, username: req.query.username});
-});
-
-app.post('/joinRoom', async (req, res) => {
-    res.redirect(`/chat/${await req.body.room}?username=${req.body.username}`);
-});
-
-app.get('/', (req, res) => {
-    res.render('index');
-});
+const rooms = new Map();
 
 // Handle WebSocket connections
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
-
-    // Join a room
-    socket.on('joinRoom', (room) => {
-        socket.join(room);
-        console.log(`User ${socket.id} joined room ${room}`);
-
-        // Send existing drawings to the newly connected user
-        socket.emit('initializeFeed', room, drawings);
-    });
 
     // Join a room
     socket.on('joinRoom', (room) => {
@@ -65,13 +45,42 @@ io.on('connection', (socket) => {
             drawings.push(drawingData);
         }
         // Broadcast the new drawing to all users in the room
-        io.to(room).emit('newDrawing', { drawingData, username: username });
+        io.to(room).emit('newDrawing', { drawingData, username });
     });
 
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
     });
 });
+
+app.get('/chat/:room', (req, res) => {
+    res.render('chatroom', {room: req.params.room, username: req.query.username});
+});
+
+app.post('/joinRoom', async (req, res) => {
+    res.redirect(`/chat/${await req.body.room}?username=${req.body.username}`);
+});
+
+app.get('/', (req, res) => {
+    res.render('index');
+});
+
+app.get('/stats', (req, res) => {
+    const allRooms = Array.from(io.sockets.adapter.rooms.entries());
+    const rooms = allRooms
+        .filter(([roomName, room]) => !io.sockets.sockets.has(roomName)) // Exclude private socket rooms
+        .map(([roomName, room]) => ({
+            roomName,
+            userCount: room.size,
+            maxUsers: 10,
+        }));
+
+    res.json({
+        totalUsers: io.sockets.sockets.size,
+        rooms,
+    });
+});
+
 
 const PORT = 3000;
 server.listen(PORT, () => {
