@@ -1,138 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PictoRoom!</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
-        #canvasContainer {
-            display: inline-block;
-            position: relative;
-        }
-
-        canvas {
-            border: 1px solid black;
-            cursor: crosshair;
-        }
-
-        #sideButtons {
-            position: absolute;
-            top: 50%;
-            right: -60px;
-            width: 50px;
-            border: 2px solid black;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            transform: translateY(-50%);
-        }
-
-        #feedContainer {
-            width: 400px;
-            height: 300px;
-            margin: 20px auto;
-            border: 1px solid #ccc;
-            overflow-y: scroll;
-        }
-
-        #feed {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .drawing {
-            margin: 10px auto;
-            border: 1px solid #ccc;
-        }
-    </style>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-</head>
-<body> 
-    <div id="feedContainer">
-        <div id="feed"></div>
-    </div>
-    <h1>PictoRoom, by Poyo!</h1>
-    <div id="canvasContainer">
-        <canvas id="drawingCanvas" width="350" height="200"></canvas>
-        <div id="sideButtons">
-            <button id="sendButton">Send</button>
-            <button id="clearButton">Clear</button>
+<%- include("header.ejs") %>
+    <div class="container">
+        <style>
+            body {
+                font-family: 'Noto Sans', sans-serif;
+                background-color: #f0f0f0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .container {
+                background-color: #fff;
+                border: 2px solid #000;
+                width: 320px;
+                padding: 20px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .header img {
+                width: 100px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+            }
+            .form-group input {
+                width: 100%;
+                padding: 8px;
+                box-sizing: border-box;
+            }
+            .btn {
+                width: 100%;
+                padding: 10px;
+                background-color: #0073e6;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+            }
+            .btn:hover {
+                background-color: #005bb5;
+            }
+        </style>
+        <div class="header">
+            <h1>PictoRoom!</h1>
         </div>
+        <form action="/joinRoom" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="room">Room Code (invent one for generating a room)</label>
+                <input type="text" id="room" name="room" required>
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
     </div>
-
-    <script>
-        const socket = io();
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d');
-        const sendButton = document.getElementById('sendButton');
-        const clearButton = document.getElementById('clearButton');
-        const feedContainer = document.getElementById('feedContainer');
-        const feed = document.getElementById('feed');
-
-        let drawing = false;
-
-        // Start drawing on mousedown
-        canvas.addEventListener('mousedown', (e) => {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        });
-
-        // Draw on mousemove
-        canvas.addEventListener('mousemove', (e) => {
-            if (!drawing) return;
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-        });
-
-        // Stop drawing on mouseup
-        canvas.addEventListener('mouseup', () => {
-            drawing = false;
-        });
-
-        // Send the current drawing
-        sendButton.addEventListener('click', () => {
-            const drawingData = canvas.toDataURL();
-
-            // Emit the drawing data to the server
-            socket.emit('sendDrawing', drawingData);
-
-            // Clear the canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
-
-        // Clear the canvas
-        clearButton.addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
-
-        // Add a drawing to the feed
-        const addDrawingToFeed = (drawingData) => {
-            const img = document.createElement('img');
-            img.src = drawingData;
-            img.classList.add('drawing');
-            img.width = 400; // Scale for feed
-            feed.appendChild(img);
-
-            // Scroll to the bottom of the feed
-            feedContainer.scrollTop = feedContainer.scrollHeight;
-        };
-
-        // Receive existing feed on load
-        socket.on('initializeFeed', (existingDrawings) => {
-            existingDrawings.forEach(addDrawingToFeed);
-        });
-
-        // Receive a new drawing
-        socket.on('newDrawing', (drawingData) => {
-            addDrawingToFeed(drawingData);
-        });
-    </script>
 </body>
 </html>
