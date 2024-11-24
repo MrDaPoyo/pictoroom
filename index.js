@@ -32,8 +32,14 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    // Send existing drawings to the newly connected user
-    socket.emit('initializeFeed', drawings);
+    // Join a room
+    socket.on('joinRoom', (room) => {
+        socket.join(room);
+        console.log(`User ${socket.id} joined room ${room}`);
+
+        // Send existing drawings to the newly connected user
+        socket.emit('initializeFeed', room, drawings);
+    });
 
     // Join a room
     socket.on('joinRoom', (room) => {

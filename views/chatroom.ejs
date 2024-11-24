@@ -85,7 +85,11 @@
         const clearButton = document.getElementById('clearButton');
         const feedContainer = document.getElementById('feedContainer');
         const feed = document.getElementById('feed');
+        const room = "<%= room %>";
+        const username = "<%= username %>";
 
+        // Join the assigned room
+        socket.emit('joinRoom', room);
         let drawing = false;
 
         // Start drawing on mousedown
@@ -112,7 +116,7 @@
             const drawingData = canvas.toDataURL();
 
             // Emit the drawing data to the server
-            socket.emit('sendDrawing', drawingData);
+            socket.emit('sendDrawing', room, drawingData);
 
             // Clear the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
