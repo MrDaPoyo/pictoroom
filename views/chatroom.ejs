@@ -12,7 +12,7 @@
         }
 
         canvas {
-            border: 1px solid black;
+            border: 1px solid #ccc;
             cursor: crosshair;
         }
 
@@ -25,20 +25,6 @@
             font-size: 14px;
             cursor: pointer;
             transform: translateY(-50%);
-        }
-
-        button {
-            width: 100%;
-            background-color: white;
-            color: black;
-            border: 0.5px solid black;
-            height: 50px;
-            padding: 1px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #f0f0f0;
         }
 
         #feedContainer {
@@ -67,130 +53,134 @@
             padding: 0;
         }
 
-    .drawing .username {
-        font-weight: bold;
-        color: white;
-        padding: 5px;
-        border-radius: 5px;
-        position: absolute;
-        top: 1px;
-        left: 15px;
-    }
-    .drawing .username p {
-        margin: 0;
-        padding: 0;
-    }
+        .drawing .username {
+            font-weight: bold;
+            background-color: white;
+            color: black;
+            border: 0.5px solid black;
+            padding: 5px;
+            border-radius: 5px;
+            position: absolute;
+            top: 1px;
+            left: 15px;
+        }
+
+        .drawing .username p {
+            margin: 0;
+            padding: 0;
+        }
     </style>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-</head>
-<body> 
-    <div id="feedContainer">
-        <div id="feed"></div>
-    </div>
-    <h1 style="margin-bottom: 0;">PictoRoom!</h1>
-    <small>By <a href="https://poyoweb.org">Poyo</a>!</small><br>
-    <div id="canvasContainer">
-        <canvas id="drawingCanvas" width="350" height="200"></canvas>
-        <div id="sideButtons">
-            <button id="sendButton">Send</button>
-            <button id="clearButton">Clear</button>
+    </head>
+
+    <body>
+        <div id="feedContainer">
+            <div id="feed"></div>
         </div>
-    </div>
+        <h1 style="margin-bottom: 0;">PictoRoom!</h1>
+        <small>By <a href="https://poyoweb.org">Poyo</a>!</small><br>
+        <div id="canvasContainer">
+            <canvas id="drawingCanvas" width="350" height="200"></canvas>
+            <div id="sideButtons">
+                <button id="sendButton">Send</button>
+                <button id="clearButton">Clear</button>
+            </div>
+        </div>
 
-    <script>
-        const socket = io();
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d');
-        const sendButton = document.getElementById('sendButton');
-        const clearButton = document.getElementById('clearButton');
-        const feedContainer = document.getElementById('feedContainer');
-        const feed = document.getElementById('feed');
-        const room = "<%= room %>";
-        const username = "<%= username %>";
+        <script>
+            const socket = io();
+            const canvas = document.getElementById('drawingCanvas');
+            const ctx = canvas.getContext('2d');
+            const sendButton = document.getElementById('sendButton');
+            const clearButton = document.getElementById('clearButton');
+            const feedContainer = document.getElementById('feedContainer');
+            const feed = document.getElementById('feed');
+            const room = "<%= room %>";
+            const username = "<%= username %>";
 
-        // Join the assigned room
-        socket.emit('joinRoom', room);
-        let drawing = false;
-        let userColor;
+            // Join the assigned room
+            socket.emit('joinRoom', room);
+            let drawing = false;
+            let userColor;
 
-        // Retrieve assigned color from server
-        socket.on('assignColor', (color) => {
-            userColor = color;
-        });
+            // Retrieve assigned color from server
+            socket.on('assignColor', (color) => {
+                userColor = color;
+            });
 
-        // Draw with assigned color
-        canvas.addEventListener('mousemove', (e) => {
-            if (!drawing) return;
-            ctx.strokeStyle = userColor;
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-        });
+            // Draw with assigned color
+            canvas.addEventListener('mousemove', (e) => {
+                if (!drawing) return;
+                ctx.strokeStyle = userColor;
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            });
 
-        // Start drawing on mousedown
-        canvas.addEventListener('mousedown', (e) => {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        });
+            // Start drawing on mousedown
+            canvas.addEventListener('mousedown', (e) => {
+                drawing = true;
+                ctx.beginPath();
+                ctx.moveTo(e.offsetX, e.offsetY);
+            });
 
-        // Draw on mousemove
-        canvas.addEventListener('mousemove', (e) => {
-            if (!drawing) return;
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-        });
+            // Draw on mousemove
+            canvas.addEventListener('mousemove', (e) => {
+                if (!drawing) return;
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            });
 
-        // Stop drawing on mouseup
-        canvas.addEventListener('mouseup', () => {
-            drawing = false;
-        });
+            // Stop drawing on mouseup
+            canvas.addEventListener('mouseup', () => {
+                drawing = false;
+            });
 
-        // Send the current drawing
-        sendButton.addEventListener('click', () => {
-            const drawingData = canvas.toDataURL();
+            // Send the current drawing
+            sendButton.addEventListener('click', () => {
+                const drawingData = canvas.toDataURL();
 
-            // Emit the drawing data to the server
-            socket.emit('sendDrawing', room, drawingData, username);
+                // Emit the drawing data to the server
+                socket.emit('sendDrawing', room, drawingData, username);
+
+                // Clear the canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
 
             // Clear the canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
+            clearButton.addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
 
-        // Clear the canvas
-        clearButton.addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
+            // Add a drawing to the feed
+            const addDrawingToFeed = ({ drawingData, username }) => {
+                const container = document.createElement('div');
+                container.classList.add('drawing');
 
-        // Add a drawing to the feed
-        const addDrawingToFeed = ({ drawingData, username }) => {
-            const container = document.createElement('div');
-            container.classList.add('drawing');
+                const img = document.createElement('img');
+                img.src = drawingData;
+                img.width = 400; // Scale for feed
 
-            const img = document.createElement('img');
-            img.src = drawingData;
-            img.width = 400; // Scale for feed
+                const userLabel = document.createElement('p');
+                userLabel.textContent = username;
+                userLabel.classList.add('username');
+                container.appendChild(userLabel);
+                container.appendChild(img);
+                feed.appendChild(container);
 
-            const userLabel = document.createElement('p');
-            userLabel.textContent = username;
-            userLabel.classList.add('username');
-            userLabel.style.backgroundColor = userColor;
-            container.appendChild(userLabel);
-            container.appendChild(img);
-            feed.appendChild(container);
+                // Scroll to the bottom of the feed
+                feedContainer.scrollTop = feedContainer.scrollHeight;
+            };
 
-            // Scroll to the bottom of the feed
-            feedContainer.scrollTop = feedContainer.scrollHeight;
-        };
+            // Receive existing feed on load
+            socket.on('initializeFeed', (existingDrawings) => {
+                existingDrawings.forEach(addDrawingToFeed);
+            });
 
-        // Receive existing feed on load
-        socket.on('initializeFeed', (existingDrawings) => {
-            existingDrawings.forEach(addDrawingToFeed);
-        });
+            // Receive a new drawing
+            socket.on('newDrawing', (drawingData) => {
+                addDrawingToFeed(drawingData);
+            });
+        </script>
+    </body>
 
-        // Receive a new drawing
-        socket.on('newDrawing', (drawingData) => {
-            addDrawingToFeed(drawingData);
-        });
-    </script>
-</body>
-</html>
+    </html>
