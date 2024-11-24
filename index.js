@@ -6,24 +6,31 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Serve static files (if needed)
-app.use(express.static('public'));
-
-// Set EJS as the template engine
 app.set('view engine', 'ejs');
 
-// Route for the main page
+// Store the feed of drawings
+const drawings = [];
+
 app.get('/', (req, res) => {
     res.render('index');
 });
 
-// WebSocket logic
+// Handle WebSocket connections
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    // Listen for drawing data and broadcast to other clients
-    socket.on('draw', (data) => {
-        socket.broadcast.emit('draw', data);
+    // Send existing drawings to the newly connected user
+    socket.emit('initializeFeed', drawings);
+
+    // Handle new drawing submissions
+    socket.on('sendDrawing', (drawingData) => {
+        // Add drawing to the feed
+        if (drawingData && Object.keys(drawingData).length > 0) {
+            drawings.push(drawingData);
+        }
+
+        // Broadcast the new drawing to all users
+        io.emit('newDrawing', drawingData);
     });
 
     socket.on('disconnect', () => {
