@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PictoChat Clone</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            cursor: crosshair;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+    </style>
+    <!-- Load Socket.IO from CDN -->
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Welcome to PictoChat Clone</h1>
+    <canvas id="drawingCanvas" width="400" height="400"></canvas>
+
+    <script defer>
+        // Initialize Socket.IO client
+        const socket = io();
+
+        // Canvas setup
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        // Start drawing on mousedown
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        // Draw on mousemove
+        canvas.addEventListener('mousemove', (e) => {
+            if (!drawing) return;
+
+            const x = e.offsetX;
+            const y = e.offsetY;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+
+            // Emit draw data to the server
+            socket.emit('draw', { x, y, type: 'mousemove' });
+        });
+
+        // Stop drawing on mouseup
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+
+        // Listen for drawing data from the server
+        socket.on('draw', (data) => {
+            if (data.type === 'mousemove') {
+                ctx.lineTo(data.x, data.y);
+                ctx.stroke();
+            }
+        });
+    </script>
+</body>
+</html>

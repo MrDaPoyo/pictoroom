@@ -1,51 +1,37 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
-const path = require('path');
+const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server);
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files (if needed)
+app.use(express.static('public'));
+
+// Set EJS as the template engine
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 
-io.on('connection', (socket) => {
-    console.log('a user connected');
-
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
-    });
-
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
-    
-    socket.on('canvas data', (data) => {
-        io.emit('canvas data', data);
-    });
-});
-
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-
+// Route for the main page
 app.get('/', (req, res) => {
     res.render('index');
 });
 
-app.get('/chat', (req, res) => {
-    res.redirect('/');
+// WebSocket logic
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    // Listen for drawing data and broadcast to other clients
+    socket.on('draw', (data) => {
+        socket.broadcast.emit('draw', data);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('A user disconnected:', socket.id);
+    });
 });
 
-app.get('/chat/:room', (req, res) => {
-    const room = req.params.room;
-    const name = req.query.name;
-    if (!name) {
-        return res.redirect('/');
-    }
-    res.render('chat', { room, name });
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
