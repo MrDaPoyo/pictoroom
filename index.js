@@ -44,6 +44,15 @@ io.on('connection', (socket) => {
     // Join a room
     socket.on('joinRoom', (room) => {
         socket.join(room);
+        const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
+        if (roomSize >= 10) {
+            socket.emit('roomFull', room);
+            return;
+        }
+
+        const colors = ['lime', 'red', 'blue', 'green', 'orange', 'purple', 'black', 'darkslateblue', 'brown', 'magenta'];
+        const userColor = colors[roomSize % colors.length];
+        socket.emit('assignColor', userColor);
         console.log(`User ${socket.id} joined room ${room}`);
     });
 
