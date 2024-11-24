@@ -24,14 +24,14 @@ io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
     // Join a room
-    socket.on('joinRoom', (room) => {
+    socket.on('joinRoom', (room, username) => {
         socket.join(room);
         const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
         if (roomSize >= 10) {
             socket.emit('roomFull', room);
             return;
         }
-
+        io.to(room).emit('userJoined', { message: `User ${username} joined the room`, userCount: roomSize });
         const colors = ['lime', 'red', 'blue', 'green', 'orange', 'purple', 'black', 'darkslateblue', 'brown', 'magenta'];
         const userColor = colors[roomSize % colors.length];
         socket.emit('assignColor', userColor);

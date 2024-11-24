@@ -98,7 +98,7 @@
             const username = "<%= username %>";
 
             // Join the assigned room
-            socket.emit('joinRoom', room);
+            socket.emit('joinRoom', room, username);
             let drawing = false;
             let userColor;
 
@@ -178,6 +178,19 @@
             // Receive a new drawing
             socket.on('newDrawing', (drawingData) => {
                 addDrawingToFeed(drawingData);
+            });
+
+            socket.on('userJoined', (data) => {
+                const feed = document.getElementById('feed');
+                const container = document.createElement('div');
+                const userLabel = document.createElement('p');
+                userLabel.textContent = data.message;
+                userLabel.classList.add('username');
+                container.appendChild(userLabel);
+                feed.appendChild(container);
+
+                // Scroll to the bottom of the feed
+                feedContainer.scrollTop = feedContainer.scrollHeight;
             });
         </script>
 <%- include("footer.ejs") %>
