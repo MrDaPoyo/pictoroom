@@ -116,7 +116,7 @@
             const drawingData = canvas.toDataURL();
 
             // Emit the drawing data to the server
-            socket.emit('sendDrawing', room, drawingData);
+            socket.emit('sendDrawing', room, drawingData, username);
 
             // Clear the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -128,12 +128,21 @@
         });
 
         // Add a drawing to the feed
-        const addDrawingToFeed = (drawingData) => {
+        const addDrawingToFeed = ({ drawingData, username }) => {
+            const container = document.createElement('div');
+            container.classList.add('drawing');
+
             const img = document.createElement('img');
             img.src = drawingData;
-            img.classList.add('drawing');
             img.width = 400; // Scale for feed
-            feed.appendChild(img);
+
+            const userLabel = document.createElement('p');
+            userLabel.textContent = username;
+            userLabel.style.fontWeight = 'bold';
+
+            container.appendChild(userLabel);
+            container.appendChild(img);
+            feed.appendChild(container);
 
             // Scroll to the bottom of the feed
             feedContainer.scrollTop = feedContainer.scrollHeight;

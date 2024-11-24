@@ -48,14 +48,13 @@ io.on('connection', (socket) => {
     });
 
     // Handle new drawing submissions for a specific room
-    socket.on('sendDrawing', (room, drawingData) => {
+    socket.on('sendDrawing', (room, drawingData, username) => {
         // Add drawing to the feed
-        if (drawingData && Object.keys(drawingData).length > 0) {
+        if (drawingData && Object.keys(drawingData).length > 0 && username) {
             drawings.push(drawingData);
         }
-
         // Broadcast the new drawing to all users in the room
-        io.to(room).emit('newDrawing', drawingData);
+        io.to(room).emit('newDrawing', { drawingData, username: username });
     });
 
     socket.on('disconnect', () => {
