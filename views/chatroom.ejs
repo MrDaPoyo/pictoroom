@@ -21,22 +21,24 @@
             top: 50%;
             right: -60px;
             width: 50px;
-            border: 2px solid black;
             color: white;
             font-size: 14px;
             cursor: pointer;
             transform: translateY(-50%);
         }
 
-        #sideButtons button {
+        button {
             width: 100%;
             background-color: white;
             color: black;
             border: 0.5px solid black;
             height: 50px;
-            width: 50px;
             padding: 1px;
             cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #f0f0f0;
         }
 
         #feedContainer {
@@ -85,7 +87,8 @@
     <div id="feedContainer">
         <div id="feed"></div>
     </div>
-    <h1>PictoRoom, by Poyo!</h1>
+    <h1 style="margin-bottom: 0;">PictoRoom!</h1>
+    <small>By <a href="https://poyoweb.org">Poyo</a>!</small><br>
     <div id="canvasContainer">
         <canvas id="drawingCanvas" width="350" height="200"></canvas>
         <div id="sideButtons">
