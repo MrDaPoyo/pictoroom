@@ -96,6 +96,7 @@
             const feed = document.getElementById('feed');
             const room = "<%= room %>";
             const username = "<%= username %>";
+            var totalDrawings = 0;
 
             // Join the assigned room
             socket.emit('joinRoom', room, username);
@@ -152,6 +153,11 @@
 
             // Add a drawing to the feed
             const addDrawingToFeed = ({ drawingData, username }) => {
+                if (totalDrawings >= 50) {
+                    feed.removeChild(feed.firstChild);
+                } else {
+                    totalDrawings++;
+                }
                 const container = document.createElement('div');
                 container.classList.add('drawing');
 
