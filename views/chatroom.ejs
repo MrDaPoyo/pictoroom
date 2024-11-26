@@ -184,7 +184,7 @@
                 const feed = document.getElementById('feed');
                 const container = document.createElement('div');
                 const userLabel = document.createElement('p');
-                userLabel.textContent = data.message;
+                userLabel.textContent = `${data.message} (Total users: ${data.userCount})`;
                 userLabel.classList.add('username');
                 container.appendChild(userLabel);
                 feed.appendChild(container);
