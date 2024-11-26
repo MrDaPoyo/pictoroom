@@ -149,6 +149,11 @@
                 feedContainer.scrollTop = feedContainer.scrollHeight;
             });
 
+            socket.on('usernameTaken', () => {
+                alert('Username is already taken. Please choose another.');
+                window.location.href = '/joinRoom?next=' + room;
+            });
+
             // Fetch and display room statistics
             const fetchRoomStats = async () => {
                 var roomStatsDiv = document.getElementById('roomStats');
