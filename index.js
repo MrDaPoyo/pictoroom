@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Store the feed of drawings
 const drawings = [];
-const rooms = new Map();
+var rooms = new Map(); // Map to store room data with users
 
 // Handle WebSocket connections
 io.on('connection', (socket) => {
@@ -35,6 +35,12 @@ io.on('connection', (socket) => {
         const colors = ['lime', 'red', 'blue', 'green', 'orange', 'purple', 'black', 'darkslateblue', 'brown', 'magenta'];
         const userColor = colors[roomSize % colors.length];
         socket.emit('assignColor', userColor);
+        const userData = { username, socketId: socket.id, color: userColor };
+        if (!rooms.has(room)) {
+            rooms.set(room, new Map());
+        }
+        rooms.get(room).set(socket.id, userData);
+        console.log(rooms.get(room));
         console.log(`User ${socket.id} joined room ${room}`);
     });
 
@@ -46,15 +52,31 @@ io.on('connection', (socket) => {
         }
         // Broadcast the new drawing to all users in the room
         io.to(room).emit('newDrawing', { drawingData, username });
+        const userRooms = Array.from(socket.rooms).filter(room => room !== socket.id);
+        userRooms.forEach((roomData) => {
+            if (rooms.has(roomData)) {
+                rooms.get(roomData).delete(socket.id);
+                if (rooms.get(roomData).size === 0) {
+                    rooms.delete(roomData);
+                }
+            }
+        });
     });
-
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
+        rooms.forEach((users, room) => {
+            if (users.has(socket.id)) {
+                users.delete(socket.id);
+                if (users.size === 0) {
+                    rooms.delete(room);
+                }
+            }
+        });
     });
 });
 
 app.get('/chat/:room', (req, res) => {
-    res.render('chatroom', {room: req.params.room, username: req.query.username});
+    res.render('chatroom', { room: req.params.room, username: req.query.username });
 });
 
 app.post('/joinRoom', async (req, res) => {
@@ -66,18 +88,16 @@ app.get('/', (req, res) => {
 });
 
 app.get('/stats', (req, res) => {
-    const allRooms = Array.from(io.sockets.adapter.rooms.entries());
-    const rooms = allRooms
-        .filter(([roomName, room]) => !io.sockets.sockets.has(roomName)) // Exclude private socket rooms
-        .map(([roomName, room]) => ({
-            roomName,
-            userCount: room.size,
-            maxUsers: 10,
-        }));
+    const roomStats = Array.from(rooms.entries()).map(([roomName, users]) => ({
+        roomName,
+        userCount: users.size,
+        users: Array.from(users.values()),
+        maxUsers: 10,
+    }));
 
     res.json({
         totalUsers: io.sockets.sockets.size,
-        rooms,
+        rooms: roomStats,
     });
 });
 
