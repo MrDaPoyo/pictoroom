@@ -91,6 +91,20 @@ app.get('/', (req, res) => {
 });
 
 app.get('/stats', (req, res) => {
+    if (req.query.room) {
+        const room = req.query.room;
+        if (rooms.has(room)) {
+            const users = rooms.get(room);
+            const userStats = Array.from(users.values());
+            return res.json({
+                roomName: room,
+                userCount: users.size,
+                users: userStats,
+                maxUsers: 10,
+            });
+        }
+        return res.json({ message: 'Room not found' });
+    }
     const roomStats = Array.from(rooms.entries()).map(([roomName, users]) => ({
         roomName,
         userCount: users.size,

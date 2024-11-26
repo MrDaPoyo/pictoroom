@@ -148,5 +148,32 @@
                 // Scroll to the bottom of the feed
                 feedContainer.scrollTop = feedContainer.scrollHeight;
             });
+
+            // Fetch and display room statistics
+            const fetchRoomStats = async () => {
+                var roomStatsDiv = document.getElementById('roomStats');
+                try {
+                    const res = await fetch(`/stats?room=${room}`);
+                    const stats = await res.json();
+
+                    // Update room statistics dynamically
+                    const roomStatsDiv = document.getElementById('roomStats');
+                    roomStatsDiv.innerHTML = `
+                        <p>Users in Room:</p>
+                        <ul>
+                            ${stats.users.map(user => `<li>${user.username}(${user.color})</li>`).join('')}
+                        </ul>
+                        <p>Total Users in Room: ${stats.userCount}</p>`
+                } catch (error) {
+                    console.error('Failed to fetch room stats:', error);
+                    roomStatsDiv.innerHTML = `<p>Error loading statistics.</p>`;
+                }
+            };
+
+            // Refresh room stats every 5 seconds
+            setInterval(fetchRoomStats, 5000);
         </script>
+        <div id="roomStats" style="position: fixed; left: 5px; bottom: 5px; padding: 0; margin: 0;">
+            <p>Loading room statistics...</p>
+        </div>
         <%- include("footer.ejs") %>
