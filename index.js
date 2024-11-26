@@ -17,6 +17,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());    // Parse cookies
 
+const generalMiddleware = (req, res, next) => {
+    res.locals.message = req.query.message;
+    next();
+}
+
+app.use(generalMiddleware);
 // Store the feed of drawings
 const drawings = [];
 var rooms = new Map(); // Map to store room data with users

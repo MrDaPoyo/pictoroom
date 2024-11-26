@@ -8,3 +8,8 @@
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+<% if (typeof message !== undefined && message) { %>
+  <div class="message-container">
+    <p class="message-alert"><%= message %></p>
+  </div>
+<% } %>

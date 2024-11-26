@@ -150,8 +150,7 @@
             });
 
             socket.on('usernameTaken', () => {
-                alert('Username is already taken. Please choose another one.');
-                window.location.href = '/joinRoom?next=' + room;
+                window.location.href = '/joinRoom?Username is already taken. Please choose another one&message=next=' + room;
             });
 
             // Fetch and display room statistics

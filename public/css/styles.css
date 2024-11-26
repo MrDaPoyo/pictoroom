@@ -1,88 +1,103 @@
 button {
-    width: 100%;
-    background-color: white;
-    color: black;
-    border: 0.5px solid #ccc;
-    height: 50px;
-    padding: 1px;
-    cursor: pointer;
-  }
+  width: 100%;
+  background-color: white;
+  color: black;
+  border: 0.5px solid #ccc;
+  height: 50px;
+  padding: 1px;
+  cursor: pointer;
+}
 
-  button:hover {
-    background-color: #f0f0f0;
-  }
+button:hover {
+  background-color: #f0f0f0;
+}
 
-  @-webkit-keyframes bg-scrolling-reverse {
-    100% {
-      background-position: 50px 50px;
-    }
+@-webkit-keyframes bg-scrolling-reverse {
+  100% {
+    background-position: 50px 50px;
   }
+}
 
-  @-moz-keyframes bg-scrolling-reverse {
-    100% {
-      background-position: 50px 50px;
-    }
+@-moz-keyframes bg-scrolling-reverse {
+  100% {
+    background-position: 50px 50px;
   }
+}
 
-  @-o-keyframes bg-scrolling-reverse {
-    100% {
-      background-position: 50px 50px;
-    }
+@-o-keyframes bg-scrolling-reverse {
+  100% {
+    background-position: 50px 50px;
   }
+}
 
-  @keyframes bg-scrolling-reverse {
-    100% {
-      background-position: 50px 50px;
-    }
+@keyframes bg-scrolling-reverse {
+  100% {
+    background-position: 50px 50px;
   }
+}
 
-  @-webkit-keyframes bg-scrolling {
-    0% {
-      background-position: 50px 50px;
-    }
+@-webkit-keyframes bg-scrolling {
+  0% {
+    background-position: 50px 50px;
   }
+}
 
-  @-moz-keyframes bg-scrolling {
-    0% {
-      background-position: 50px 50px;
-    }
+@-moz-keyframes bg-scrolling {
+  0% {
+    background-position: 50px 50px;
   }
+}
 
-  @-o-keyframes bg-scrolling {
-    0% {
-      background-position: 50px 50px;
-    }
+@-o-keyframes bg-scrolling {
+  0% {
+    background-position: 50px 50px;
   }
+}
 
-  @keyframes bg-scrolling {
-    0% {
-      background-position: 50px 50px;
-    }
+@keyframes bg-scrolling {
+  0% {
+    background-position: 50px 50px;
   }
+}
 
-  /* Main styles */
-  body {
-    /* img size is 50x50 */
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5RDYAwDEXRDgmvEocnlrQS2SwUFST9uEfBGWs9c97nbGtDcquqiKhOImLs/UpuzVzWEi1atGjRokWLFi1atGjRokWLFi1atGjRokWLFi1af7Ukz8xWp8z8AAAA//8DAJ4LoEAAlL1nAAAAAElFTkSuQmCC") repeat 0 0;
-    -webkit-animation: bg-scrolling-reverse 2s infinite;
-    /* Safari 4+ */
-    -moz-animation: bg-scrolling-reverse 2s infinite;
-    /* Fx 5+ */
-    -o-animation: bg-scrolling-reverse 2s infinite;
-    /* Opera 12+ */
-    animation: bg-scrolling-reverse 2s infinite;
-    /* IE 10+ */
-    -webkit-animation-timing-function: linear;
-    -moz-animation-timing-function: linear;
-    -o-animation-timing-function: linear;
-    animation-timing-function: linear;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    font-family: 'Noto Sans', sans-serif;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-  }
+/* Main styles */
+body {
+  /* img size is 50x50 */
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5RDYAwDEXRDgmvEocnlrQS2SwUFST9uEfBGWs9c97nbGtDcquqiKhOImLs/UpuzVzWEi1atGjRokWLFi1atGjRokWLFi1atGjRokWLFi1af7Ukz8xWp8z8AAAA//8DAJ4LoEAAlL1nAAAAAElFTkSuQmCC") repeat 0 0;
+  -webkit-animation: bg-scrolling-reverse 2s infinite;
+  /* Safari 4+ */
+  -moz-animation: bg-scrolling-reverse 2s infinite;
+  /* Fx 5+ */
+  -o-animation: bg-scrolling-reverse 2s infinite;
+  /* Opera 12+ */
+  animation: bg-scrolling-reverse 2s infinite;
+  /* IE 10+ */
+  -webkit-animation-timing-function: linear;
+  -moz-animation-timing-function: linear;
+  -o-animation-timing-function: linear;
+  animation-timing-function: linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: 'Noto Sans', sans-serif;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.message-container {
+  background-color: orange;
+  border: 2px solid #000;
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
