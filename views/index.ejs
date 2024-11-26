@@ -40,7 +40,7 @@
                 ${stats.rooms
                     .map(
                         room => `
-                    <a href="/chat/${room.roomName}?username=${document.getElementById('username').value || 'guest'+Math.floor(Math.random() * 10000)}">
+                    <a href="/joinRoom?next=${room.roomName}">
                         <div class="room">
                             <strong>Room Name:</strong> ${room.roomName}<br>
                             <strong>Users:</strong> ${room.users.map(user => user.username).join(', ')}<br>
