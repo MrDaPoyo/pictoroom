@@ -1,0 +1,13 @@
+<%- include('header.ejs') %>
+    <link rel="stylesheet" href="/css/index.css">
+    <div class="container">
+        <form action="/joinRoom" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+                <input type="hidden" id="room" name="room" value="<%= room %>">
+                <button type="submit" class="btn">Enter room</button>
+            </div>
+        </form>
+    </div>
+<%- include('footer.ejs') %>

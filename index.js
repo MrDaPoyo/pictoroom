@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());    // Parse cookies
 
 // Store the feed of drawings
 const drawings = [];
@@ -79,11 +81,30 @@ io.on('connection', (socket) => {
 });
 
 app.get('/chat/:room', (req, res) => {
-    res.render('chatroom', { room: req.params.room, username: req.query.username });
+    const cookie = req.cookies;
+    if (!cookie.username) {
+        return res.redirect('/joinRoom?next='+req.params.room);
+    }
+    res.render('chatroom', { room: req.params.room, username: cookie.username });
+});
+
+app.get('/joinRoom', (req, res) => {
+    if (!req.query.room && !req.query.next) {
+        return res.redirect('/?message=Room name is required');
+    }
+    const room = req.query.room || req.query.next;
+    res.render('joinRoom', { next: req.query.next, room: room });
 });
 
 app.post('/joinRoom', async (req, res) => {
-    res.redirect(`/chat/${await req.body.room}?username=${req.body.username}`);
+    if (!req.body.room) {
+        return res.redirect('/?message=Room name is required');
+    }
+    if (!req.body.username) {
+        return res.redirect('/joinRoom', {room: req.body.room});
+    }
+    res.cookie('username', req.body.username, { httpOnly: true, expires: new Date(Date.now() + 900000) });
+    res.redirect(`/chat/${await req.body.room || req.query.next}`);
 });
 
 app.get('/', (req, res) => {
