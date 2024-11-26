@@ -92,7 +92,7 @@
                     <a href="/chat/${room.roomName}?username=${document.getElementById('username').value || 'guest'+Math.floor(Math.random() * 10000)}">
                         <div class="room">
                             <strong>Room Name:</strong> ${room.roomName}<br>
-                            <strong>Users:</strong> ${room.users.map(user => user.username).join(', ')}
+                            <strong>Users:</strong> ${room.users.map(user => user.username).join(', ')}<br>
                             <strong>Capacity:</strong> ${room.userCount} / ${room.maxUsers}
                         </div>
                     </a>
