@@ -135,9 +135,23 @@
                 drawing = false;
             });
 
+            function isCanvasBlank(canvas) {
+                return !canvas.getContext('2d')
+                    .getImageData(0, 0, canvas.width, canvas.height).data
+                    .some(channel => channel !== 0);
+            }
+            
             // Send the current drawing
             sendButton.addEventListener('click', () => {
                 const drawingData = canvas.toDataURL();
+                if (totalDrawings >= 50) {
+                    feed.removeChild(feed.firstChild);
+                } else {
+                    totalDrawings++;
+                }
+                if (isCanvasBlank(canvas)) {
+                    return;
+                }
 
                 // Emit the drawing data to the server
                 socket.emit('sendDrawing', room, drawingData, username);
@@ -150,14 +164,8 @@
             clearButton.addEventListener('click', () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             });
-
             // Add a drawing to the feed
             const addDrawingToFeed = ({ drawingData, username }) => {
-                if (totalDrawings >= 50) {
-                    feed.removeChild(feed.firstChild);
-                } else {
-                    totalDrawings++;
-                }
                 const container = document.createElement('div');
                 container.classList.add('drawing');
 
@@ -211,4 +219,4 @@
                 feedContainer.scrollTop = feedContainer.scrollHeight;
             });
         </script>
-<%- include("footer.ejs") %>
+        <%- include("footer.ejs") %>
