@@ -66,12 +66,15 @@ io.on('connection', (socket) => {
         console.log('A user disconnected:', socket.id);
         rooms.forEach((users, room) => {
             if (users.has(socket.id)) {
+                const user = users.get(socket.id);
+                io.to(room).emit('userLeft', { message: `User ${user.username} left the room`, userCount: users.size - 1 });
                 users.delete(socket.id);
                 if (users.size === 0) {
                     rooms.delete(room);
                 }
             }
         });
+        socket.emit('userLeft', 'User left the room');
     });
 });
 
