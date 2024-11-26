@@ -161,7 +161,7 @@
                     roomStatsDiv.innerHTML = `
                         <p>Users in Room:</p>
                         <ul>
-                            ${stats.users.map(user => `<li>${user.username}(${user.color})</li>`).join('')}
+                            ${stats.users.map(user => `<li>${user.username}(<span style="color:${user.color};">${user.color}</span>)</li>`).join('')}
                         </ul>
                         <p>Total Users in Room: ${stats.userCount}</p>`
                 } catch (error) {
@@ -171,7 +171,9 @@
             };
 
             // Refresh room stats every 5 seconds
-            setInterval(fetchRoomStats, 5000);
+            if (!/Mobi|Android/i.test(navigator.userAgent)) {
+                setInterval(fetchRoomStats, 5000);
+            }
         </script>
         <div id="roomStats" style="position: fixed; left: 5px; bottom: 5px; padding: 0; margin: 0;">
             <p>Loading room statistics...</p>
