@@ -64,15 +64,6 @@ io.on('connection', (socket) => {
         }
         // Broadcast the new drawing to all users in the room
         io.to(room).emit('newDrawing', { drawingData, username });
-        const userRooms = Array.from(socket.rooms).filter(room => room !== socket.id);
-        userRooms.forEach((roomData) => {
-            if (rooms.has(roomData)) {
-                rooms.get(roomData).delete(socket.id);
-                if (rooms.get(roomData).size === 0) {
-                    rooms.delete(roomData);
-                }
-            }
-        });
     });
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
@@ -86,14 +77,12 @@ io.on('connection', (socket) => {
                 }
             }
         });
-        socket.emit('userLeft', 'User left the room');
-    });
+    });    
 });
-
 app.get('/chat/:room', (req, res) => {
     const cookie = req.cookies;
     if (!cookie.username) {
-        return res.redirect('/joinRoom?next='+req.params.room);
+        return res.redirect('/joinRoom?next=' + req.params.room);
     }
     res.render('chatroom', { room: req.params.room, username: cookie.username });
 });
@@ -111,7 +100,7 @@ app.post('/joinRoom', async (req, res) => {
         return res.redirect('/?message=Room name is required');
     }
     if (!req.body.username) {
-        return res.redirect('/joinRoom', {room: req.body.room});
+        return res.redirect('/joinRoom', { room: req.body.room });
     }
     res.cookie('username', req.body.username, { httpOnly: true, expires: new Date(Date.now() + 900000) });
     res.redirect(`/chat/${await req.body.room || req.query.next}`);
