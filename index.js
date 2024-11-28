@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
@@ -19,6 +20,7 @@ app.use(cookieParser());    // Parse cookies
 
 const generalMiddleware = (req, res, next) => {
     res.locals.message = req.query.message;
+    res.locals.url = process.env.URL_ENTIRE;
     next();
 }
 

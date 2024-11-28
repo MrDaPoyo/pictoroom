@@ -14,7 +14,18 @@
                 <button id="sendButton">Send</button>
                 <button id="clearButton">Clear</button>
                 <button id="leaveButton" onclick="window.location.href='/'">Leave</button>
-                <button id="shareButton" onclick="window.location.href='/joinRoom?next=' + '<%= room %>'">Share</button>
+                <button id="shareButton" onclick="shareRoom()">Share</button>
+                <script>
+                    function shareRoom() {
+                        navigator.clipboard.writeText('<%= url %>joinRoom?next=<%= room %>').then(() => {
+                            const shareButton = document.getElementById('shareButton');
+                            shareButton.textContent = 'Copied!';
+                            setTimeout(() => {
+                                shareButton.textContent = 'Share';
+                            }, 5000);
+                        });
+                    }
+                </script>
             </div>
         </div>
 
