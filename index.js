@@ -27,9 +27,15 @@ app.use(generalMiddleware);
 const drawings = [];
 var rooms = new Map(); // Map to store room data with users
 
+const colors = ['lime', 'red', 'blue', 'green', 'orange', 'purple', 'black', 'darkslateblue', 'brown', 'magenta'];
+let usedColors = {};
+
 // Handle WebSocket connections
-io.on('connection', (socket) => {
+io.on('connection', (socket, room) => {
     console.log('A user connected:', socket.id);
+    socket.on('getColors', (room) => {
+        socket.emit('updateColors', colors.filter(c => !usedColors[room]?.includes(c)));
+    });
 
     // Join a room
     socket.on('joinRoom', (room, username) => {
@@ -44,7 +50,6 @@ io.on('connection', (socket) => {
         }
         socket.join(room);
         io.to(room).emit('userJoined', { message: `User ${username} joined the room`, userCount: roomSize + 1 });
-        const colors = ['lime', 'red', 'blue', 'green', 'orange', 'purple', 'black', 'darkslateblue', 'brown', 'magenta'];
         const userColor = colors[roomSize % colors.length];
         socket.emit('assignColor', userColor);
         const userData = { username, socketId: socket.id, color: userColor };
@@ -54,6 +59,22 @@ io.on('connection', (socket) => {
         rooms.get(room).set(socket.id, userData);
         console.log(rooms.get(room));
         console.log(`User ${socket.id} joined room ${room}`);
+
+        socket.on('chooseColor', (color) => {
+            if (!usedColors[room]) {
+                usedColors[room] = [];
+            }
+            if (!usedColors[room].includes(color)) {
+                usedColors[room].push(color);
+                socket.color = color;
+                socket.emit('assignColor', color);
+                io.to(room).emit('updateColors', colors.filter(c => !usedColors[room].includes(c)));
+            } else {
+                socket.emit('colorTaken', color);
+            }
+        });
+
+        socket.emit('updateColors', colors.filter(c => !usedColors[room]?.includes(c)));
     });
 
     // Handle new drawing submissions for a specific room
@@ -77,7 +98,11 @@ io.on('connection', (socket) => {
                 }
             }
         });
-    });    
+        if (socket.color) {
+            usedColors[room] = usedColors[room].filter(c => c !== socket.color);
+            io.to(room).emit('updateColors', colors.filter(c => !usedColors[room].includes(c)));
+        }
+    });
 });
 app.get('/chat/:room', (req, res) => {
     const cookie = req.cookies;

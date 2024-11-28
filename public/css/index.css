@@ -36,3 +36,12 @@
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
+.colorContainer {
+    display: flex;
+    gap: 5px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}

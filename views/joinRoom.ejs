@@ -1,14 +1,44 @@
+<!-- joinRoom.ejs -->
 <%- include('header.ejs') %>
-    <link rel="stylesheet" href="/css/index.css">
-    <div class="container">
-        <h2>Choose an username!</h2>
-        <form action="/joinRoom" method="POST">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
-                <input type="hidden" id="room" name="room" value="<%= room %>">
-                <button type="submit" class="btn">Enter room</button>
-            </div>
-        </form>
-    </div>
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<link rel="stylesheet" href="/css/index.css">
+<div class="container">
+    <h2>Choose an username!</h2>
+    <form action="/joinRoom" method="POST">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+            <input type="hidden" id="room" name="room" value="<%= room %>">
+            <div id="colorContainer" class="colorContainer"></div>
+            <input type="hidden" id="selectedColor" name="selectedColor">
+            <button type="submit" class="btn">Enter room</button>
+        </div>
+    </form>
+</div>
+<script>
+    const room = document.getElementById('room').value;
+    var colorContainer = document.getElementById('colorContainer');
+    var selectedColorInput = document.getElementById('selectedColor');
+    const socket = io();
+    socket.emit('getColors', room);
+    socket.on('updateColors', (colors) => {
+        console.log(colors);
+        colors.forEach(color => {
+            var colorDiv = document.createElement('div');
+            colorDiv.style.backgroundColor = color;
+            colorDiv.style.width = '25px';
+            colorDiv.style.height = '25px';
+            colorDiv.style.display = 'inline-block';
+            colorDiv.style.cursor = 'pointer';
+            colorDiv.addEventListener('click', () => {
+                selectedColorInput.value = color;
+                document.querySelectorAll('.colorContainer div').forEach(div => {
+                    div.style.border = 'none';
+                });
+                colorDiv.style.border = '2px solid black';
+            });
+            colorContainer.appendChild(colorDiv);
+        });
+    });
+</script>
 <%- include('footer.ejs') %>
