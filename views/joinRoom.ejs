@@ -1,45 +1,77 @@
 <!-- joinRoom.ejs -->
 <%- include('header.ejs') %>
-<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-<link rel="stylesheet" href="/css/index.css">
-<div class="container">
-    <h2>Choose an username!</h2>
-    <form action="/joinRoom" method="POST">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
-            <input type="hidden" id="room" name="room" value="<%= room %>">
-            <h2 style="margin-bottom: 0;">Choose a color!</h2>
-            <div id="colorContainer" class="colorContainer" style="margin-bottom: 1vh;"></div>
-            <input type="hidden" id="selectedColor" name="selectedColor">
-            <button type="submit" class="btn">Enter room</button>
-        </div>
-    </form>
-</div>
-<script>
-    const room = document.getElementById('room').value;
-    var colorContainer = document.getElementById('colorContainer');
-    var selectedColorInput = document.getElementById('selectedColor');
-    const socket = io();
-    socket.emit('getColors', room);
-    socket.on('updateColors', (colors) => {
-        console.log(colors);
-        colors.forEach(color => {
-            var colorDiv = document.createElement('div');
-            colorDiv.style.backgroundColor = color;
-            colorDiv.style.width = '25px';
-            colorDiv.style.height = '25px';
-            colorDiv.style.display = 'inline-block';
-            colorDiv.style.cursor = 'pointer';
-            colorDiv.addEventListener('click', () => {
-                selectedColorInput.value = color;
-                document.querySelectorAll('.colorContainer div').forEach(div => {
-                    div.style.border = 'none';
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <link rel="stylesheet" href="/css/index.css">
+    <div class="container">
+        <h2>Choose an username!</h2>
+        <form action="/joinRoom" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+                <input type="hidden" id="room" name="room" value="<%= room %>">
+                <h2 style="margin-bottom: 0;">Choose a color!</h2>
+                <div id="colorContainer" class="colorContainer" style="margin-bottom: 1vh;"></div>
+                <input type="hidden" id="selectedColor" name="selectedColor">
+                <button type="submit" class="btn">Enter room</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        const room = document.getElementById('room').value;
+        var colorContainer = document.getElementById('colorContainer');
+        var selectedColorInput = document.getElementById('selectedColor');
+        const socket = io();
+        socket.emit('getColors', room);
+        const colorNames = {
+            "black": "white",
+            "white": "black",
+            "red": "cyan",
+            "green": "magenta",
+            "blue": "yellow",
+            "yellow": "blue",
+            "magenta": "green",
+            "cyan": "red",
+            "gray": "white",
+            "grey": "white",
+            "maroon": "lime",
+            "olive": "navy",
+            "purple": "lime",
+            "teal": "maroon",
+            "navy": "olive",
+            "lime": "purple",
+            "silver": "black",
+            "aqua": "maroon",
+            "fuchsia": "green"
+        };
+
+        function invertColor(color) {
+            return colorNames[color.toLowerCase()] || 'black';
+        }
+
+        socket.on('updateColors', (colors) => {
+            console.log(colors);
+            colors.forEach(color => {
+                var colorDiv = document.createElement('div');
+                colorDiv.style.backgroundColor = color;
+                colorDiv.style.width = '25px';
+                colorDiv.style.height = '25px';
+                colorDiv.style.display = 'inline-block';
+                colorDiv.style.display = 'flex';
+                colorDiv.style.justifyContent = 'center';
+                colorDiv.style.alignItems = 'center';
+                colorDiv.style.color = invertColor(color);
+                colorDiv.style.cursor = 'pointer';
+                colorDiv.addEventListener('click', () => {
+                    selectedColorInput.value = color;
+                    document.querySelectorAll('.colorContainer div').forEach(div => {
+                        div.style.border = 'none';
+                        div.textContent = '';
+                    });
+                    colorDiv.appendChild(document.createTextNode('X'));
+                    colorDiv.style.border = '2px solid black';
                 });
-                colorDiv.style.border = '2px solid black';
+                colorContainer.appendChild(colorDiv);
             });
-            colorContainer.appendChild(colorDiv);
         });
-    });
-</script>
-<%- include('footer.ejs') %>
+    </script>
+    <%- include('footer.ejs') %>
