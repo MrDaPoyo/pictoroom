@@ -122,7 +122,7 @@ app.get('/joinRoom', (req, res) => {
 
 app.post('/joinRoom', async (req, res) => {
     if (!req.body.room) {
-        return res.redirect('/?message=Room name and color are required');
+        return res.redirect('/?message=Room name is required');
     }
     if (!req.body.username) {
         return res.redirect('/joinRoom', { room: req.body.room });
