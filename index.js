@@ -75,7 +75,9 @@ io.on('connection', (socket, room) => {
                 socket.emit('colorTaken', color);
             }
         });
-
+        if (colors.filter(c => !usedColors[room]?.includes(c)).length === 0) {
+            return socket.emit('updateColors', []);
+        }
         socket.emit('updateColors', colors.filter(c => !usedColors[room]?.includes(c)));
     });
 

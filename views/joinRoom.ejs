@@ -2,15 +2,17 @@
 <%- include('header.ejs') %>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <link rel="stylesheet" href="/css/index.css">
-    <div class="container">
+    <div class="container" id="container">
         <h2>Choose an username!</h2>
-        <form action="/joinRoom" method="POST">
+        <form action="/joinRoom" method="POST" id="form">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
                 <input type="hidden" id="room" name="room" value="<%= room %>">
                 <h2 style="margin-bottom: 0;">Choose a color!</h2>
-                <div id="colorContainer" class="colorContainer" style="margin-bottom: 1vh;"></div>
+                <div id="colorContainer" class="colorContainer" style="margin-bottom: 1vh;">
+                    <p>Loading available colors...</p>
+                </div>
                 <input type="hidden" id="selectedColor" name="selectedColor">
                 <button type="submit" class="btn">Enter room</button>
             </div>
@@ -49,7 +51,11 @@
         }
 
         socket.on('updateColors', (colors) => {
+            colorContainer.innerHTML = '';
             console.log(colors);
+            if (colors.length === 0) {
+                document.getElementById("container").innerHTML = '<h2>Room is full!</h2><p>Try again later!</p>';
+            }
             colors.forEach(color => {
                 var colorDiv = document.createElement('div');
                 colorDiv.style.backgroundColor = color;
