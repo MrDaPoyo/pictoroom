@@ -9,10 +9,12 @@
         </div>
         <div id="canvasContainer">
             <canvas id="drawingCanvas" width="350" height="200"></canvas>
+            <div id="keyboard" width="350" height="200"></div>
             <div id="sideButtons">
                 <button id="sendButton">Send</button>
                 <button id="clearButton">Clear</button>
                 <button id="leaveButton" onclick="window.location.href='/'">Leave</button>
+                <button id="shareButton" onclick="window.location.href='/joinRoom?next=' + '<%= room %>'">Share</button>
             </div>
         </div>
 
