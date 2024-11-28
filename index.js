@@ -38,7 +38,7 @@ io.on('connection', (socket, room) => {
     });
 
     // Join a room
-    socket.on('joinRoom', (room, username) => {
+    socket.on('joinRoom', (room, username, color) => {
         const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
         if (roomSize >= 10) {
             socket.emit('roomFull', room);
@@ -50,7 +50,7 @@ io.on('connection', (socket, room) => {
         }
         socket.join(room);
         io.to(room).emit('userJoined', { message: `User ${username} joined the room`, userCount: roomSize + 1 });
-        const userColor = colors[roomSize % colors.length];
+        const userColor = color || colors.find(c => !usedColors[room]?.includes(c)) || colors[roomSize % colors.length];
         socket.emit('assignColor', userColor);
         const userData = { username, socketId: socket.id, color: userColor };
         if (!rooms.has(room)) {
@@ -109,7 +109,7 @@ app.get('/chat/:room', (req, res) => {
     if (!cookie.username) {
         return res.redirect('/joinRoom?next=' + req.params.room);
     }
-    res.render('chatroom', { room: req.params.room, username: cookie.username });
+    res.render('chatroom', { room: req.params.room, username: cookie.username, color: req.query.color || undefined });
 });
 
 app.get('/joinRoom', (req, res) => {
@@ -121,14 +121,14 @@ app.get('/joinRoom', (req, res) => {
 });
 
 app.post('/joinRoom', async (req, res) => {
-    if (!req.body.room) {
-        return res.redirect('/?message=Room name is required');
+    if (!req.body.room || !req.body.selectedColor) {
+        return res.redirect('/?message=Room name and color are required');
     }
     if (!req.body.username) {
         return res.redirect('/joinRoom', { room: req.body.room });
     }
     res.cookie('username', req.body.username, { httpOnly: true, expires: new Date(Date.now() + 900000) });
-    res.redirect(`/chat/${await req.body.room || req.query.next}`);
+    res.redirect(`/chat/${await req.body.room || req.query.next}?color=${req.body.selectedColor}`);
 });
 
 app.get('/', (req, res) => {

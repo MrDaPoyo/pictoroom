@@ -26,10 +26,11 @@
             const feed = document.getElementById('feed');
             const room = "<%= room %>";
             const username = "<%= username %>";
+            var color = "<%= color %>";
             var totalDrawings = 0;
 
             // Join the assigned room
-            socket.emit('joinRoom', room, username);
+            socket.emit('joinRoom', room, username, color);
             let drawing = false;
             let userColor;
 
