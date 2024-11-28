@@ -121,14 +121,16 @@ app.get('/joinRoom', (req, res) => {
 });
 
 app.post('/joinRoom', async (req, res) => {
-    if (!req.body.room || !req.body.selectedColor) {
+    if (!req.body.room) {
         return res.redirect('/?message=Room name and color are required');
     }
     if (!req.body.username) {
         return res.redirect('/joinRoom', { room: req.body.room });
     }
+    var color = req.body.selectedColor;
+    color = color || colors.find(c => !usedColors[req.body.room]?.includes(c)) || colors[0];
     res.cookie('username', req.body.username, { httpOnly: true, expires: new Date(Date.now() + 900000) });
-    res.redirect(`/chat/${await req.body.room || req.query.next}?color=${req.body.selectedColor}`);
+    res.redirect(`/chat/${await req.body.room || req.query.next}?color=${color}`);
 });
 
 app.get('/', (req, res) => {
