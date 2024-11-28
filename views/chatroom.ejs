@@ -40,6 +40,14 @@
             });
 
             // Draw with assigned color
+            const getTouchPos = (canvas, touchEvent) => {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: touchEvent.touches[0].clientX - rect.left,
+                    y: touchEvent.touches[0].clientY - rect.top
+                };
+            };
+
             canvas.addEventListener('mousemove', (e) => {
                 if (!drawing) return;
                 ctx.strokeStyle = userColor;
@@ -47,22 +55,42 @@
                 ctx.stroke();
             });
 
-            // Start drawing on mousedown
+            // Start drawing on mousedown or touchstart
             canvas.addEventListener('mousedown', (e) => {
                 drawing = true;
                 ctx.beginPath();
                 ctx.moveTo(e.offsetX, e.offsetY);
             });
 
-            // Draw on mousemove
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                drawing = true;
+                const pos = getTouchPos(canvas, e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            });
+
+            // Draw on mousemove or touchmove
             canvas.addEventListener('mousemove', (e) => {
                 if (!drawing) return;
                 ctx.lineTo(e.offsetX, e.offsetY);
                 ctx.stroke();
             });
 
-            // Stop drawing on mouseup
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!drawing) return;
+                const pos = getTouchPos(canvas, e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            });
+
+            // Stop drawing on mouseup or touchend
             canvas.addEventListener('mouseup', () => {
+                drawing = false;
+            });
+
+            canvas.addEventListener('touchend', () => {
                 drawing = false;
             });
 
@@ -179,6 +207,8 @@
             if (!/Mobi|Android/i.test(navigator.userAgent)) {
                 setInterval(fetchRoomStats, 5000);
             }
+
+            fetchRoomStats();
         </script>
         <div id="roomStats" style="position: fixed; left: 5px; bottom: 5px; padding: 0; margin: 0;">
             <p>Loading room statistics...</p>
